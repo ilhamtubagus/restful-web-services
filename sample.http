@@ -1,0 +1,17 @@
+### GET all users
+GET http://localhost:8080/users
+
+### GET specific users
+GET http://localhost:8080/users/4
+
+### Add User
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "name": "",
+  "birthDate": "2027-02-04"
+}
+
+### Delete user
+DELETE http://localhost:8080/users/1
