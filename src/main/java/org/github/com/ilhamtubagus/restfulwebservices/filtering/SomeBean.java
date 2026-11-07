@@ -2,14 +2,18 @@ package org.github.com.ilhamtubagus.restfulwebservices.filtering;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 
 // @JsonIgnoreProperties({"field1", "field2"}) // static filtering class level
 public class SomeBean {
+    @JsonView(View.View1.class)
     private String field1;
 
-    @JsonIgnore // static filtering field level
+    // @JsonIgnore // static filtering field level
+    @JsonView(View.View2.class)
     private String field2;
 
+    @JsonView({View.View1.class, View.View2.class}) // Contains in both view
     private String field3;
 
     public SomeBean(String field1, String field2, String field3) {
