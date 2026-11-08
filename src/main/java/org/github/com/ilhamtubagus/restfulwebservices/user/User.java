@@ -1,16 +1,23 @@
 package org.github.com.ilhamtubagus.restfulwebservices.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
+@Entity(name = "user_details")
 public class User {
+    @Id
+    @GeneratedValue
     private Integer id;
 
     @Size(min = 2, message = "Name should have at least 2 characters")
-    @JsonProperty("nama") // change the response field as "nama" instead of "name"
+//    @JsonProperty("nama") // change the response field as "nama" instead of "name"
     private String name;
 
     @Past(message = "Birth date should be in the past")
@@ -20,6 +27,11 @@ public class User {
         this.id = id;
         this.name = name;
         this.birthDate = birthDate;
+    }
+
+    // Default constructor is needed by JPA to create instances of the entity class using Reflection
+    // this default constructor can be in public or protected
+    public User() {
     }
 
     public Integer getId() {
