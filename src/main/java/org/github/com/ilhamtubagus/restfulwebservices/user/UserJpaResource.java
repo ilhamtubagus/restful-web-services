@@ -1,6 +1,7 @@
 package org.github.com.ilhamtubagus.restfulwebservices.user;
 
 import jakarta.validation.Valid;
+import org.github.com.ilhamtubagus.restfulwebservices.jpa.PostRepository;
 import org.github.com.ilhamtubagus.restfulwebservices.jpa.UserRepository;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -21,8 +22,11 @@ public class UserJpaResource {
 
     private final UserRepository repository;
 
-    public UserJpaResource(UserRepository repository) {
+    private final PostRepository postRepository;
+
+    public UserJpaResource(UserRepository repository, PostRepository postRepository) {
         this.repository = repository;
+        this.postRepository = postRepository;
     }
 
     @GetMapping("/users")
@@ -67,6 +71,44 @@ public class UserJpaResource {
         }
 
         return user.get().getPosts();
+    }
+
+    @PostMapping("/users/{id}/posts")
+    public ResponseEntity<Object> createPostForUser(@PathVariable int id, @Valid @RequestBody Post post){
+        Optional<User> user = this.repository.findById(id);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("id:"+id);
+        }
+
+        // set user to post
+        post.setUser(user.get());
+
+        // save the changes
+        Post savedPost = this.postRepository.save(post);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(savedPost.getId()).toUri();
+
+        return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping("/users/{id}/posts/{postId}")
+    public EntityModel<Post> retrieveUserPostById(@PathVariable int id, @PathVariable int postId){
+        Optional<User> user = this.repository.findById(id);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("id:"+id);
+        }
+
+        List<Post> posts = user.get().getPosts();
+        Post post = posts.stream().filter(p -> p.getId() == postId).findFirst().orElse(null);
+
+        // Wrap domain object and adding links to it
+        assert post != null;
+        EntityModel<Post> entityModel = EntityModel.of(post);
+        WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrievePostsForUser(id));
+        entityModel.add(linkTo.withRel("all-posts"));
+
+        return entityModel;
     }
 
 }
