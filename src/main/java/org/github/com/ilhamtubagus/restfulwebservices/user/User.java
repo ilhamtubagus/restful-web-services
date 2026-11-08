@@ -1,14 +1,13 @@
 package org.github.com.ilhamtubagus.restfulwebservices.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity(name = "user_details")
 public class User {
@@ -22,6 +21,10 @@ public class User {
 
     @Past(message = "Birth date should be in the past")
     private LocalDate birthDate;
+
+    @OneToMany(mappedBy = "user") // pointing to field "user" in Post entity
+    @JsonIgnore // we don't want to include posts in response
+    private List<Post> posts;
 
     public User(Integer id, String name, LocalDate birthDate) {
         this.id = id;
