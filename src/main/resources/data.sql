@@ -1,3 +1,5 @@
+-- Can only be used in in-memory database like h2
+
 insert into user_details (id, birth_date, name)
 values (10001, current_date(), 'Ilham');
 
